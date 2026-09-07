@@ -127,11 +127,20 @@ def generate_clinical_summary_jpg(
     draw.text((640, 255), 'ปัจจัยสำคัญที่สุดเฉพาะราย (Patient-Level TreeSHAP Impact):', fill='#ffffff', font=f_bold)
     y_shap = 285
     if top_shap:
+        max_v = max([abs(x[1]) for x in top_shap[:5]] + [0.5])
         for name, val in top_shap[:5]:
             sign = '+' if val > 0 else ''
             c = '#f43f5e' if val > 0 else '#10b981'
             draw.text((645, y_shap), f'• {name}', fill='#cbd5e1', font=f_body)
-            draw.text((W-110, y_shap), f'{sign}{val:.3f}', fill=c, font=f_bold)
+
+            # Mini score bar
+            bar_w = int((abs(val) / max_v) * 85)
+            bar_w = max(4, min(85, bar_w))
+            bar_x = 970
+            draw.rectangle([bar_x, y_shap + 6, bar_x + 85, y_shap + 14], fill='#0f172a', outline='#1e293b', width=1)
+            draw.rectangle([bar_x, y_shap + 6, bar_x + bar_w, y_shap + 14], fill=c)
+
+            draw.text((1070, y_shap), f'{sign}{val:.3f}', fill=c, font=f_bold)
             y_shap += 32
     else:
         draw.text((645, y_shap), '• ไม่พบปัจจัยเสี่ยงผิดปกติเด่นชัด', fill='#94a3b8', font=f_body)

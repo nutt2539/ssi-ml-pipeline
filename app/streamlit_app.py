@@ -800,43 +800,67 @@ with tab2:
     """)
 
     if top_feats:
-        max_abs_val = max([abs(x[1]) for x in top_feats] + [0.1])
+        # Authentic Matplotlib SHAP Score Bar Chart (Diverging horizontal bar chart)
+        try:
+            import matplotlib
+            matplotlib.use('Agg')
+            import matplotlib.pyplot as plt
+            import matplotlib.font_manager as fm
 
-        # Modern Glassmorphic SHAP Bars in pure HTML/CSS
-        bars_html = []
-        for name, val in top_feats:
-            is_risk = val > 0
-            pct = min(100, int((abs(val) / max_abs_val) * 100))
-            color = "#f43f5e" if is_risk else "#10b981"
-            bg_glow = "rgba(244, 63, 94, 0.15)" if is_risk else "rgba(16, 185, 129, 0.15)"
-            sign = "+" if is_risk else ""
-            direction_label = "ดันเสี่ยงเพิ่ม" if is_risk else "ช่วยลดความเสี่ยง"
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            font_path = os.path.join(base_dir, "fonts", "Sarabun-Regular.ttf")
+            font_bold_path = os.path.join(base_dir, "fonts", "Sarabun-Bold.ttf")
 
-            bars_html.append(f"""
-            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-radius: 10px; padding: 10px 14px; margin-bottom: 8px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 0.82rem;">
-                <span style="font-weight: 600; color: #f1f5f9;">{name}</span>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 0.7rem; color: #94a3b8; background: {bg_glow}; padding: 2px 8px; border-radius: 6px; border: 1px solid {color}40;">{direction_label}</span>
-                  <span style="font-weight: 800; font-family: monospace; color: {color};">{sign}{val:.3f}</span>
-                </div>
-              </div>
-              <div style="width: 100%; height: 8px; background: #0b1120; border-radius: 9999px; overflow: hidden;">
-                <div style="width: {pct}%; height: 100%; background: {color}; border-radius: 9999px; transition: width 0.4s ease;"></div>
-              </div>
-            </div>
-            """)
+            if os.path.exists(font_path) and os.path.exists(font_bold_path):
+                font_prop = fm.FontProperties(fname=font_path, size=11)
+                font_bold = fm.FontProperties(fname=font_bold_path, size=12)
+                font_title = fm.FontProperties(fname=font_bold_path, size=13)
+            else:
+                font_prop = fm.FontProperties(size=11)
+                font_bold = fm.FontProperties(size=12, weight='bold')
+                font_title = fm.FontProperties(size=13, weight='bold')
 
-        shap_container_html = f"""
-        <div style="background: rgba(2, 6, 23, 0.5); border: 1px solid #1e293b; border-radius: 14px; padding: 16px; margin-bottom: 14px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span style="font-size: 0.88rem; font-weight: 700; color: #ffffff;">Top 10 Feature Contributions (Log-Odds Impact)</span>
-            <span style="font-size: 0.72rem; color: #94a3b8;">🔴 เสี่ยงสูงขึ้น | 🟢 ช่วยลดเสี่ยง</span>
-          </div>
-          {''.join(bars_html)}
-        </div>
-        """
-        st.html(shap_container_html)
+            names = [x[0] for x in top_feats][::-1]
+            values = [x[1] for x in top_feats][::-1]
+            bar_colors = ['#F43F5E' if v > 0 else '#10B981' for v in values]
+
+            fig, ax = plt.subplots(figsize=(10, max(5.2, len(names) * 0.55)))
+            fig.patch.set_facecolor('#0B1120')
+            ax.set_facecolor('#0F172A')
+
+            bars = ax.barh(names, values, color=bar_colors, edgecolor='none', height=0.6)
+            ax.axvline(0, color='#64748B', linestyle='--', linewidth=1.2, alpha=0.8)
+
+            # Value labels directly on bars
+            ax.bar_label(bars, fmt='%+.3f', padding=6, fontproperties=font_bold, color='#F8FAFC')
+
+            min_v, max_v = min(values), max(values)
+            pad_l = max(abs(min_v) * 0.35, 0.1) if min_v < 0 else 0.08
+            pad_r = max(abs(max_v) * 0.35, 0.1) if max_v > 0 else 0.08
+            ax.set_xlim(min_v - pad_l, max_v + pad_r)
+
+            for label in ax.get_yticklabels():
+                label.set_fontproperties(font_prop)
+                label.set_color('#F1F5F9')
+
+            for label in ax.get_xticklabels():
+                label.set_fontproperties(font_prop)
+                label.set_color('#94A3B8')
+
+            ax.set_xlabel('SHAP Value (น้ำหนักคะแนนต่อความเสี่ยง: 🟢 ช่วยลดเสี่ยง | 🔴 ดันเสี่ยงเพิ่ม)', fontproperties=font_bold, color='#E2E8F0', labelpad=10)
+            ax.set_title(f'Top {len(names)} Feature Contributions for Current Patient ({model_name})', fontproperties=font_title, color='#FFFFFF', pad=14)
+
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+            ax.spines['left'].set_color('#334155')
+            ax.spines['bottom'].set_color('#334155')
+            ax.grid(axis='x', color='#1E293B', linestyle=':', alpha=0.6)
+
+            plt.tight_layout()
+            st.pyplot(fig, clear_figure=True)
+            plt.close(fig)
+        except Exception as e:
+            st.error(f"Error rendering SHAP chart: {e}")
 
         # Clinical Interpretation Bullet Cards
         risk_increasing = [f for f in feat_contribs if f[1] > 0.05][:4]
