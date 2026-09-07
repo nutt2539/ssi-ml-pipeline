@@ -361,9 +361,18 @@ def load_model_artifacts():
         except Exception:
             pass
 
-    return model, model_name, is_calibrated, scaler, explainer, feature_names
+    shap_baseline = None
+    baseline_path = os.path.join(MODELS_DIR, "shap_baseline.json")
+    if os.path.exists(baseline_path):
+        try:
+            with open(baseline_path, "r") as f:
+                shap_baseline = json.load(f)
+        except Exception:
+            shap_baseline = None
 
-model, model_name, is_calibrated, scaler, explainer, feature_names = load_model_artifacts()
+    return model, model_name, is_calibrated, scaler, explainer, feature_names, shap_baseline
+
+model, model_name, is_calibrated, scaler, explainer, feature_names, shap_baseline = load_model_artifacts()
 
 if model is None:
     st.warning("⚠️ Model weights not found in `models/`. Please run `python run_pipeline.py` first to train the models.")
@@ -495,6 +504,43 @@ else:
 # Compute patient-level TreeSHAP feature contributions
 top_feats = []
 feat_contribs = []
+
+name_mapping = {
+    "age": "อายุ (Age)",
+    "bmi": "ดัชนีมวลกาย (BMI)",
+    "sex_male": "เพศชาย (Male)",
+    "diabetes": "โรคเบาหวาน (DM)",
+    "ckd": "ไตเรื้อรัง (CKD)",
+    "cirrhosis": "ตับแข็ง (Cirrhosis)",
+    "malignancy": "มะเร็ง (Malignancy)",
+    "smoking": "สูบบุหรี่ (Smoking)",
+    "steroid_immunosuppressant": "ยากดภูมิ/สเตียรอยด์",
+    "asa_class": "ASA Physical Status",
+    "emergency": "ผ่าตัดฉุกเฉิน (Emergency)",
+    "preop_albumin": "Albumin ก่อนผ่าตัด",
+    "preop_hct": "ความเข้มข้นเลือด (Hct)",
+    "preop_wbc": "เม็ดเลือดขาว (WBC)",
+    "wound_class": "ระดับความสะอาดแผล (Wound Class)",
+    "approach_open": "ผ่าตัดเปิดหน้าท้อง (Open)",
+    "operative_time_min": "ระยะเวลาผ่าตัด (Duration)",
+    "ebl_ml": "ปริมาณเลือดที่เสีย (EBL)",
+    "intraop_hypothermia": "อุณหภูมิกายต่ำใน OR (<36°C)",
+    "intraop_hypotension": "ความดันตกใน OR",
+    "intraop_transfusion": "ให้เลือดใน OR",
+    "atb_redosing_needed": "จำเป็นต้อง Redose ยาฆ่าเชื้อ",
+    "atb_redosing_given": "ได้รับ Redose ยาฆ่าเชื้อ",
+    "specialty_Colorectal": "แผนก Colorectal",
+    "specialty_Hepatobiliary": "แผนก Hepatobiliary",
+    "specialty_Upper_GI": "แผนก Upper GI",
+    "specialty_Breast_Endocrine": "แผนก Breast & Endocrine",
+    "specialty_Vascular": "แผนก Vascular",
+    "specialty_General": "แผนก General Surgery",
+    "atb_Compliant_Within_60min": "ให้ยาปฏิชีวนะตรงเวลา (<60 นาที)",
+    "atb_Late_After_Incision": "ให้ยาปฏิชีวนะช้า (หลังลงมีด)",
+    "atb_None_Given": "ไม่ได้รับยาปฏิชีวนะป้องกัน"
+}
+
+# 1. Primary: Use loaded explainer
 if explainer is not None:
     try:
         shap_values = explainer(input_df)
@@ -505,45 +551,33 @@ if explainer is not None:
             sv_patient = sv[0, :]
         else:
             sv_patient = sv
-
-        name_mapping = {
-            "age": "อายุ (Age)",
-            "bmi": "ดัชนีมวลกาย (BMI)",
-            "sex_male": "เพศชาย (Male)",
-            "diabetes": "โรคเบาหวาน (DM)",
-            "ckd": "ไตเรื้อรัง (CKD)",
-            "cirrhosis": "ตับแข็ง (Cirrhosis)",
-            "malignancy": "มะเร็ง (Malignancy)",
-            "smoking": "สูบบุหรี่ (Smoking)",
-            "steroid_immunosuppressant": "ยากดภูมิ/สเตียรอยด์",
-            "asa_class": "ASA Physical Status",
-            "emergency": "ผ่าตัดฉุกเฉิน (Emergency)",
-            "preop_albumin": "Albumin ก่อนผ่าตัด",
-            "preop_hct": "ความเข้มข้นเลือด (Hct)",
-            "preop_wbc": "เม็ดเลือดขาว (WBC)",
-            "wound_class": "ระดับความสะอาดแผล (Wound Class)",
-            "approach_open": "ผ่าตัดเปิดหน้าท้อง (Open)",
-            "operative_time_min": "ระยะเวลาผ่าตัด (Duration)",
-            "ebl_ml": "ปริมาณเลือดที่เสีย (EBL)",
-            "intraop_hypothermia": "อุณหภูมิกายต่ำใน OR (<36°C)",
-            "intraop_hypotension": "ความดันตกใน OR",
-            "intraop_transfusion": "ให้เลือดใน OR",
-            "atb_redosing_needed": "จำเป็นต้อง Redose ยาฆ่าเชื้อ",
-            "atb_redosing_given": "ได้รับ Redose ยาฆ่าเชื้อ",
-            "specialty_Colorectal": "แผนก Colorectal",
-            "atb_Compliant_Within_60min": "ให้ยาปฏิชีวนะตรงเวลา (<60 นาที)",
-            "atb_Late_After_Incision": "ให้ยาปฏิชีวนะช้า (หลังลงมีด)",
-            "atb_None_Given": "ไม่ได้รับยาปฏิชีวนะป้องกัน"
-        }
         feat_cols = input_df.columns.tolist()
         for i, col in enumerate(feat_cols):
-            val = sv_patient[i]
+            val = float(sv_patient[i])
             readable_name = name_mapping.get(col, col)
             feat_contribs.append((readable_name, val))
-        feat_contribs.sort(key=lambda x: abs(x[1]), reverse=True)
-        top_feats = feat_contribs[:10]
     except Exception:
-        top_feats = []
+        feat_contribs = []
+
+# 2. Resilient Fallback: Exact mathematical calculation via shap_baseline
+if not feat_contribs and shap_baseline is not None:
+    try:
+        import numpy as np
+        means = np.array(shap_baseline["mean"])
+        coefs = np.array(shap_baseline["coef"])
+        raw_vals = input_df.values[0]
+        sv_calc = (raw_vals - means) * coefs
+        feat_cols = shap_baseline.get("feature_names", input_df.columns.tolist())
+        for i, col in enumerate(feat_cols):
+            val = float(sv_calc[i])
+            readable_name = name_mapping.get(col, col)
+            feat_contribs.append((readable_name, val))
+    except Exception:
+        feat_contribs = []
+
+if feat_contribs:
+    feat_contribs.sort(key=lambda x: abs(x[1]), reverse=True)
+    top_feats = feat_contribs[:10]
 
 # Generate High-Resolution Clinical Summary Card (JPG)
 summary_jpg_bytes = generate_clinical_summary_jpg(
