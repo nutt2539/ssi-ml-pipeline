@@ -9,10 +9,21 @@ import datetime
 from PIL import Image, ImageDraw, ImageFont
 
 def get_best_font(size=14, bold=False):
-    """Attempt to load a high-quality system font that supports Thai and English."""
+    """Attempt to load a high-quality font that supports Thai and English."""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    bundled_bold = os.path.join(base_dir, 'fonts', 'Sarabun-Bold.ttf')
+    bundled_regular = os.path.join(base_dir, 'fonts', 'Sarabun-Regular.ttf')
+
+    primary = bundled_bold if bold else bundled_regular
+    secondary = bundled_regular if bold else bundled_bold
+
     font_candidates = [
-        '/System/Library/Fonts/ThonburiUI.ttc',
+        primary,
+        secondary,
         '/System/Library/Fonts/Supplemental/Thonburi.ttc',
+        '/System/Library/Fonts/ThonburiUI.ttc',
+        '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+        '/usr/share/fonts/truetype/freefont/FreeSans.ttf',
         '/Library/Fonts/Arial Unicode.ttf',
         '/System/Library/Fonts/Supplemental/Arial.ttf',
         '/System/Library/Fonts/Helvetica.ttc'
@@ -40,7 +51,7 @@ def generate_clinical_summary_jpg(
     img = Image.new('RGB', (W, H), color='#020617')
     draw = ImageDraw.Draw(img)
 
-    f_title = get_best_font(24, bold=True)
+    f_title = get_best_font(23, bold=True)
     f_sub = get_best_font(13)
     f_head = get_best_font(16, bold=True)
     f_body = get_best_font(13)
@@ -48,16 +59,19 @@ def generate_clinical_summary_jpg(
     f_huge = get_best_font(44, bold=True)
     f_badge = get_best_font(15, bold=True)
 
+    # Clean badge label from emoji chars
+    clean_badge = badge_label.replace("🔴", "").replace("🟡", "").replace("🟢", "").strip()
+
     # 1. Top Hospital Header Card
     draw.rectangle([25, 20, W-25, 105], fill='#0f172a', outline='#1e293b', width=1)
-    draw.text((45, 32), '🏥 โรงพยาบาลสมเด็จพระปิ่นเกล้า กรมแพทย์ทหารเรือ | SOMDECH PHRA PINKLAO HOSPITAL', fill='#ffffff', font=f_title)
+    draw.text((45, 32), 'โรงพยาบาลสมเด็จพระปิ่นเกล้า กรมแพทย์ทหารเรือ | SOMDECH PHRA PINKLAO HOSPITAL', fill='#ffffff', font=f_title)
     draw.text((45, 72), 'Surgical Site Infection (SSI) Risk Assessment Report | End-of-Surgery Bedside Decision Support', fill='#94a3b8', font=f_sub)
     now_str = datetime.datetime.now().strftime('%d/%m/%Y %H:%M น.')
     draw.text((W-240, 72), f'เวลาประเมิน: {now_str}', fill='#38bdf8', font=f_sub)
 
     # 2. Left Panel: Patient & Surgical Factors
     draw.rectangle([25, 120, 600, 475], fill='#090e1a', outline='#1e293b', width=1)
-    draw.text((45, 135), '📋 ข้อมูลผู้ป่วยและปัจจัยการผ่าตัด (Patient & OR Factors)', fill='#38bdf8', font=f_head)
+    draw.text((45, 135), 'ข้อมูลผู้ป่วยและปัจจัยการผ่าตัด (Patient & OR Factors)', fill='#38bdf8', font=f_head)
     draw.line([45, 162, 580, 162], fill='#1e293b', width=1)
 
     age = patient_info.get("age", "-")
@@ -100,14 +114,17 @@ def generate_clinical_summary_jpg(
     risk_bg = '#1e0a12' if risk_prob >= 15.0 else '#1e1405' if risk_prob >= 7.0 else '#041f17'
 
     draw.rectangle([620, 120, W-25, 475], fill=risk_bg, outline=risk_color, width=2)
-    draw.text((640, 135), '⚠️ ผลการทำนายความเสี่ยงการติดเชื้อ (Predicted SSI Risk)', fill=risk_color, font=f_head)
+    draw.text((640, 135), 'ผลการประเมินความเสี่ยงการติดเชื้อ (Predicted SSI Risk)', fill=risk_color, font=f_head)
     draw.line([640, 162, W-45, 162], fill=risk_color, width=1)
 
     draw.text((640, 180), f'{risk_prob:.1f}%', fill=risk_color, font=f_huge)
-    draw.rectangle([820, 192, W-45, 235], fill='#0f172a', outline=risk_color, width=1)
-    draw.text((835, 204), f'{badge_label}', fill=risk_color, font=f_badge)
+    
+    # Badge Box with color indicator circle
+    draw.rectangle([815, 192, W-45, 235], fill='#0f172a', outline=risk_color, width=1)
+    draw.ellipse([830, 208, 842, 220], fill=risk_color)
+    draw.text((852, 202), clean_badge, fill=risk_color, font=f_badge)
 
-    draw.text((640, 255), '🔍 ปัจจัยสำคัญที่สุดเฉพาะราย (Patient-Level TreeSHAP Impact):', fill='#ffffff', font=f_bold)
+    draw.text((640, 255), 'ปัจจัยสำคัญที่สุดเฉพาะราย (Patient-Level TreeSHAP Impact):', fill='#ffffff', font=f_bold)
     y_shap = 285
     if top_shap:
         for name, val in top_shap[:5]:
@@ -121,7 +138,7 @@ def generate_clinical_summary_jpg(
 
     # 4. Bottom Panel: Clinical Action Plan
     draw.rectangle([25, 490, W-25, 785], fill='#090e1a', outline='#1e293b', width=1)
-    draw.text((45, 505), '💡 มาตรการทางการแพทย์เฉพาะบุคคลที่แนะนำ (Clinical Care Plan: CDC / SIS Guidelines)', fill='#38bdf8', font=f_head)
+    draw.text((45, 505), 'มาตรการทางการแพทย์เฉพาะบุคคลที่แนะนำ (Clinical Care Plan: CDC / SIS Guidelines)', fill='#38bdf8', font=f_head)
     draw.line([45, 532, W-45, 532], fill='#1e293b', width=1)
 
     if not care_plans:
@@ -135,7 +152,7 @@ def generate_clinical_summary_jpg(
 
     y_plan = 548
     for cp in care_plans:
-        draw.text((45, y_plan), f'✔  {cp}', fill='#e2e8f0', font=f_body)
+        draw.text((45, y_plan), f'•  {cp}', fill='#e2e8f0', font=f_body)
         y_plan += 42
 
     # 5. Footer and Doctor Signature
