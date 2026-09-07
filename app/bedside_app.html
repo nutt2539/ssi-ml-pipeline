@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSI Risk Calculator & Decision Support | Somdech Phra Pinklao Hospital</title>
+  <!-- Comprehensive Embedded Stylesheet Active (Offline Ready) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    /* Full Self-Contained Offline CSS for Bedside SSI Risk App */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      letter-spacing: normal !important;
+    }
+
+    body {
+      font-family: 'Prompt', 'Sarabun', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #020617;
+      color: #f8fafc;
+      line-height: 1.65;
+      min-height: 100vh;
+      padding: 1.25rem;
+      margin: 0;
+    }
+
+    /* Typography line heights to prevent Thai vowel collisions */
+    p, span, div, label, li, td, th {
+      line-height: 1.65;
+      letter-spacing: normal;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      line-height: 1.35;
+      letter-spacing: normal;
+    }
+
+    /* Layout Utilities */
+    .min-h-screen { min-height: 100vh; }
+    .grid { display: grid; }
+    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    @media (min-width: 640px) {
+      .sm\:text-2xl { font-size: 1.5rem; line-height: 1.35; }
+      .sm\:gap-4 { gap: 1rem; }
+      .sm\:p-5 { padding: 1.25rem; }
+    }
+
+    @media (min-width: 768px) {
+      .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (min-width: 1024px) {
+      .lg\:grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+      .lg\:col-span-4 { grid-column: span 4 / span 4; }
+      .lg\:col-span-8 { grid-column: span 8 / span 8; }
+    }
+
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .flex-wrap { flex-wrap: wrap; }
+    .items-center { align-items: center; }
+    .items-baseline { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .justify-center { justify-content: center; }
+    .hidden { display: none !important; }
+    .block { display: block; }
+
+    /* Spacing & Gaps */
+    .gap-1 { gap: 0.25rem; }
+    .gap-1\.5 { gap: 0.375rem; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-3 { gap: 0.75rem; }
+    .gap-4 { gap: 1rem; }
+    .gap-5 { gap: 1.25rem; }
+
+    .space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.25rem; }
+    .space-y-1\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.375rem; }
+    .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+    .space-y-2\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.625rem; }
+    .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
+    .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
+    .space-x-3 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.75rem; }
+
+    /* Padding */
+    .p-1\.5 { padding: 0.375rem; }
+    .p-2 { padding: 0.5rem; }
+    .p-2\.5 { padding: 0.625rem; }
+    .p-3 { padding: 0.75rem; }
+    .p-3\.5 { padding: 0.875rem; }
+    .p-4 { padding: 1rem; }
+    .p-5 { padding: 1.25rem; }
+    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+    .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .py-0\.5 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
+    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+    .py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .pb-2 { padding-bottom: 0.5rem; }
+    .pb-2\.5 { padding-bottom: 0.625rem; }
+    .pb-4 { padding-bottom: 1rem; }
+    .pt-1 { padding-top: 0.25rem; }
+    .pt-2 { padding-top: 0.5rem; }
+    .pt-3 { padding-top: 0.75rem; }
+    .pt-5 { padding-top: 1.25rem; }
+
+    /* Margins */
+    .mb-0\.5 { margin-bottom: 0.125rem; }
+    .mb-1 { margin-bottom: 0.25rem; }
+    .mb-1\.5 { margin-bottom: 0.375rem; }
+    .mb-5 { margin-bottom: 1.25rem; }
+    .mt-1 { margin-top: 0.25rem; }
+    .mt-2 { margin-top: 0.5rem; }
+
+    /* Sizing */
+    .w-full { width: 100%; }
+    .w-11 { width: 2.75rem; }
+    .h-11 { height: 2.75rem; }
+    .h-1\.5 { height: 0.375rem; }
+    .h-2 { height: 0.5rem; }
+    .h-80 { height: 20rem; }
+    .max-h-\[820px\] { max-height: 820px; }
+    .max-w-xl { max-width: 36rem; }
+    .min-w-\[210px\] { min-width: 210px; }
+
+    /* Backgrounds */
+    .bg-slate-950 { background-color: #020617; }
+    .bg-slate-950\/60 { background-color: rgba(2, 6, 23, 0.65); }
+    .bg-slate-900 { background-color: #0f172a; }
+    .bg-slate-900\/90 { background-color: rgba(15, 23, 42, 0.92); }
+    .bg-slate-800 { background-color: #1e293b; }
+    .bg-slate-800\/30 { background-color: rgba(30, 41, 59, 0.3); }
+    .bg-slate-700 { background-color: #334155; }
+    .bg-sky-600 { background-color: #0284c7; }
+    .bg-sky-600:hover { background-color: #0369a1; }
+    .bg-emerald-600 { background-color: #059669; }
+    .bg-emerald-600:hover { background-color: #047857; }
+    .bg-rose-500 { background-color: #f43f5e; }
+    .bg-emerald-500 { background-color: #10b981; }
+    .bg-rose-500\/10 { background-color: rgba(244, 63, 94, 0.12); }
+    .bg-rose-500\/20 { background-color: rgba(244, 63, 94, 0.22); }
+    .bg-amber-500\/10 { background-color: rgba(245, 158, 11, 0.12); }
+    .bg-amber-500\/20 { background-color: rgba(245, 158, 11, 0.22); }
+    .bg-emerald-500\/10 { background-color: rgba(16, 185, 129, 0.12); }
+    .bg-emerald-500\/20 { background-color: rgba(16, 185, 129, 0.22); }
+
+    /* Gradients */
+    .bg-gradient-to-tr { background-image: linear-gradient(to top right, #0ea5e9, #4f46e5); }
+    .bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-stops, #0f172a), var(--tw-gradient-to, #0f172a)); }
+    .from-rose-950\/80 { --tw-gradient-from: rgba(76, 5, 25, 0.85); --tw-gradient-stops: rgba(76, 5, 25, 0.85), #0f172a; }
+    .from-amber-950\/80 { --tw-gradient-from: rgba(69, 26, 3, 0.85); --tw-gradient-stops: rgba(69, 26, 3, 0.85), #0f172a; }
+    .from-emerald-950\/80 { --tw-gradient-from: rgba(2, 44, 34, 0.85); --tw-gradient-stops: rgba(2, 44, 34, 0.85), #0f172a; }
+    .via-slate-900 { --tw-gradient-stops: var(--tw-gradient-from), #0f172a; }
+    .to-slate-900 { --tw-gradient-to: #0f172a; }
+
+    /* Text Colors */
+    .text-white { color: #ffffff; }
+    .text-slate-100 { color: #f1f5f9; }
+    .text-slate-200 { color: #e2e8f0; }
+    .text-slate-300 { color: #cbd5e1; }
+    .text-slate-400 { color: #94a3b8; }
+    .text-slate-500 { color: #64748b; }
+    .text-sky-400 { color: #38bdf8; }
+    .text-indigo-400 { color: #818cf8; }
+    .text-emerald-300 { color: #6ee7b7; }
+    .text-emerald-400 { color: #34d399; }
+    .text-amber-300 { color: #fcd34d; }
+    .text-amber-400 { color: #fbbf24; }
+    .text-rose-300 { color: #fda4af; }
+    .text-rose-400 { color: #fb7185; }
+
+    /* Borders */
+    .border { border: 1px solid #1e293b; }
+    .border-b { border-bottom: 1px solid #1e293b; }
+    .border-b-2 { border-bottom: 2px solid; }
+    .border-t { border-top: 1px solid #1e293b; }
+    .border-slate-800 { border-color: #1e293b; }
+    .border-slate-800\/80 { border-color: rgba(30, 41, 59, 0.8); }
+    .border-slate-700 { border-color: #334155; }
+    .border-sky-500 { border-color: #0ea5e9; }
+    .border-transparent { border-color: transparent; }
+    .border-rose-500\/20 { border-color: rgba(244, 63, 94, 0.25); }
+    .border-rose-500\/30 { border-color: rgba(244, 63, 94, 0.35); }
+    .border-rose-500\/40 { border-color: rgba(244, 63, 94, 0.5); }
+    .border-amber-500\/20 { border-color: rgba(245, 158, 11, 0.25); }
+    .border-amber-500\/40 { border-color: rgba(245, 158, 11, 0.5); }
+    .border-emerald-500\/20 { border-color: rgba(16, 185, 129, 0.25); }
+    .border-emerald-500\/30 { border-color: rgba(16, 185, 129, 0.35); }
+    .border-emerald-500\/40 { border-color: rgba(16, 185, 129, 0.5); }
+
+    /* Typography */
+    .text-\[10px\] { font-size: 10px; }
+    .text-\[11px\] { font-size: 11px; }
+    .text-xs { font-size: 0.78rem; line-height: 1.5; }
+    .text-sm { font-size: 0.875rem; line-height: 1.5; }
+    .text-xl { font-size: 1.25rem; line-height: 1.4; }
+    .text-2xl { font-size: 1.5rem; line-height: 1.35; }
+    .text-5xl { font-size: 3rem; line-height: 1.15; }
+    .font-medium { font-weight: 500; }
+    .font-semibold { font-weight: 600; }
+    .font-bold { font-weight: 700; }
+    .font-extrabold { font-weight: 800; }
+    .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .uppercase { text-transform: uppercase; }
+    .tracking-tight { letter-spacing: normal; }
+    .tracking-wide { letter-spacing: 0.025em; }
+    .tracking-wider { letter-spacing: 0.05em; }
+    .text-left { text-align: left; }
+    .text-center { text-align: center; }
+    .underline { text-decoration: underline; }
+
+    /* Rounded & Shadows */
+    .rounded { border-radius: 0.25rem; }
+    .rounded-lg { border-radius: 0.5rem; }
+    .rounded-xl { border-radius: 0.75rem; }
+    .rounded-2xl { border-radius: 1rem; }
+    .rounded-full { border-radius: 9999px; }
+    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25); }
+    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.35); }
+    .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4); }
+    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+    .shadow-sky-500\/20 { box-shadow: 0 10px 20px -5px rgba(14, 165, 233, 0.3); }
+    .shadow-sky-600\/30 { box-shadow: 0 10px 20px -5px rgba(2, 132, 199, 0.35); }
+    .shadow-emerald-600\/30 { box-shadow: 0 10px 20px -5px rgba(5, 150, 105, 0.35); }
+
+    /* Form Controls & Interactions */
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    input, select, textarea {
+      font-family: inherit;
+      outline: none;
+    }
+    select option {
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+    input[type=range] {
+      accent-color: #0ea5e9;
+    }
+    .cursor-pointer { cursor: pointer; }
+    .transition-colors { transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease; }
+    .transition-all { transition: all 0.2s ease; }
+    .duration-300 { transition-duration: 300ms; }
+    .overflow-hidden { overflow: hidden; }
+    .overflow-y-auto { overflow-y: auto; }
+    .overflow-x-auto { overflow-x: auto; }
+    .border-collapse { border-collapse: collapse; }
+    .divide-y > :not([hidden]) ~ :not([hidden]) { border-top: 1px solid rgba(30, 41, 59, 0.6); }
+
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen custom-scroll p-3 sm:p-5">
+
+  <!-- Header -->
+  <div class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-4 mb-5 gap-3">
+    <div class="flex items-center space-x-3">
+      <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-2xl shadow-lg shadow-sky-500/20">
+        🩺
+      </div>
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+          End-of-Surgery SSI Risk Calculator
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            Isotonic Calibrated
+          </span>
+        </h1>
+        <p class="text-xs text-slate-400">
+          โรงพยาบาลสมเด็จพระปิ่นเกล้า กรมแพทย์ทหารเรือ &bull; ภาควิชาศัลยศาสตร์ &bull; Explainable AI Decision Support
+        </p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="exportHTMLAsJPG()" id="btn_html_export" class="px-3 py-1.5 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors flex items-center gap-1.5 shadow-md shadow-emerald-600/30 cursor-pointer">
+        <span>📸 Export ทั้งหน้าจอ (JPG)</span>
+      </button>
+      <a href="http://localhost:8501" target="_blank" class="px-3 py-1.5 text-xs font-medium bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition-colors flex items-center gap-1.5 shadow-md shadow-sky-600/30">
+        <span>🚀 เปิดหน้าเว็บจริง (Port 8501)</span>
+      </a>
+      <span class="text-xs text-slate-500 bg-slate-900 border border-slate-800 px-2.5 py-1.5 rounded-lg">
+        Model: <b>Calibrated Logistic Regression</b>
+      </span>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+    
+    <!-- LEFT SIDEBAR: PATIENT & SURGICAL INPUTS -->
+    <div class="lg:col-span-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-4 max-h-[820px] overflow-y-auto custom-scroll shadow-xl">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+          <span>📋</span> ตัวแปรทางคลินิก (OR Inputs)
+        </h2>
+        <button onclick="resetDefaults()" class="text-xs text-slate-400 hover:text-slate-200 underline">คืนค่าเดิม</button>
+      </div>
+
+      <!-- 1. Preop Demographics -->
+      <div class="bg-slate-950/60 rounded-xl p-3 border border-slate-800/80 space-y-3">
+        <div class="text-xs font-semibold text-slate-300 flex justify-between">
+          <span>1. ข้อมูลพื้นฐานผู้ป่วย</span>
+          <span class="text-[10px] text-slate-500">Demographics</span>
+        </div>
+        
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <label class="text-slate-400">อายุ (ปี):</label>
+            <span id="val_age" class="font-bold text-white">65</span>
+          </div>
+          <input type="range" id="input_age" min="18" max="90" value="65" class="w-full h-1.5 bg-slate-700 rounded-lg cursor-pointer" oninput="updateRisk()">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">เพศ:</label>
+            <select id="input_sex" class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1.5 text-white" onchange="updateRisk()">
+              <option value="Male" selected>ชาย (Male)</option>
+              <option value="Female">หญิง (Female)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">BMI (kg/m²):</label>
+            <input type="number" id="input_bmi" value="27.4" step="0.5" class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1.5 text-white" oninput="updateRisk()">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">ASA Physical Status:</label>
+            <select id="input_asa" class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1.5 text-white" onchange="updateRisk()">
+              <option value="1">Class 1</option>
+              <option value="2">Class 2</option>
+              <option value="3" selected>Class 3</option>
+              <option value="4">Class 4</option>
+            </select>
+          </div>
+          <div class="flex items-center pt-5">
+            <label class="flex items-center gap-1.5 text-xs text-amber-300 font-medium cursor-pointer">
+              <input type="checkbox" id="input_emergency" class="rounded accent-amber-500" onchange="updateRisk()">
+              <span>ผ่าตัดฉุกเฉิน (Emergency)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Comorbidities & Preop Labs -->
+      <div class="bg-slate-950/60 rounded-xl p-3 border border-slate-800/80 space-y-2.5">
+        <div class="text-xs font-semibold text-slate-300 flex justify-between">
+          <span>2. โรคประจำตัว &amp; ผลตรวจเลือด</span>
+          <span class="text-[10px] text-slate-500">Labs &amp; History</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-1.5 text-xs text-slate-300">
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" id="input_dm" checked class="rounded accent-sky-500" onchange="updateRisk()">
+            <span>เบาหวาน (DM)</span>
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" id="input_ckd" class="rounded accent-sky-500" onchange="updateRisk()">
+            <span>ไตเรื้อรัง (CKD)</span>
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" id="input_malignancy" checked class="rounded accent-sky-500" onchange="updateRisk()">
+            <span>มะเร็ง (Malignancy)</span>
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" id="input_smoking" class="rounded accent-sky-500" onchange="updateRisk()">
+            <span>สูบบุหรี่ (Smoking)</span>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-0.5">Albumin ก่อนผ่า (g/dL):</label>
+            <input type="number" id="input_albumin" value="3.0" step="0.1" class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1.5 text-white" oninput="updateRisk()">
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-0.5">Hematocrit (%):</label>
+            <input type="number" id="input_hct" value="35.0" step="1" class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1.5 text-white" oninput="updateRisk()">
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Intraoperative Surgical Factors -->
+      <div class="bg-slate-950/60 rounded-xl p-3 border border-slate-800/80 space-y-3">
+        <div class="text-xs font-semibold text-slate-300 flex justify-between">
+          <span>3. ปัจจัยระหว่างผ่าตัด</span>
+          <span class="text-[10px] text-slate-500">Intra-op</span>
+        </div>
+
+        <div>
+          <label class="text-[11px] text-slate-400 block mb-1">แผนกศัลยกรรม (Specialty):</label>
+          <select id="input_specialty" class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1.5 text-white" onchange="updateRisk()">
+            <option value="Colorectal" selected>Colorectal (ลำไส้ใหญ่และทวารหนัก)</option>
+            <option value="Hepatobiliary">Hepatobiliary (ตับและทางเดินน้ำดี)</option>
+            <option value="Upper_GI">Upper GI (กระเพาะอาหารและหลอดอาหาร)</option>
+            <option value="Breast_Endocrine">Breast &amp; Endocrine (เต้านมและต่อมไร้ท่อ)</option>
+            <option value="Vascular">Vascular (หลอดเลือด)</option>
+            <option value="General">General Surgery (ศัลยกรรมทั่วไป)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-[11px] text-slate-400 block mb-1">ความสะอาดของแผล (Wound Class):</label>
+          <select id="input_wound_class" class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1.5 text-white" onchange="updateRisk()">
+            <option value="1">Class I: Clean (สะอาด)</option>
+            <option value="2">Class II: Clean-Contaminated (กึ่งสะอาด)</option>
+            <option value="3" selected>Class III: Contaminated (ปนเปื้อน)</option>
+            <option value="4">Class IV: Dirty / Infected (ติดเชื้อ/มีหนอง)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">วิธีการผ่าตัด:</label>
+            <select id="input_approach" class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1.5 text-white" onchange="updateRisk()">
+              <option value="Open" selected>Open (เปิดหน้าท้อง)</option>
+              <option value="Laparoscopic">Laparoscopic (ส่องกล้อง)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">ยาปฏิชีวนะป้องกัน:</label>
+            <select id="input_atb_timing" class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1.5 text-white" onchange="updateRisk()">
+              <option value="Compliant_Within_60min" selected>ตรงเวลา (&lt;60 นาทีก่อนลงมีด)</option>
+              <option value="Late_After_Incision">ช้า (หลังลงมีดแล้ว)</option>
+              <option value="None_Given">ไม่ได้รับยาฆ่าเชื้อ</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <label class="text-slate-400">เวลาผ่าตัด (นาที):</label>
+            <span id="val_op_time" class="font-bold text-white">220</span>
+          </div>
+          <input type="range" id="input_op_time" min="30" max="480" value="220" step="10" class="w-full h-1.5 bg-slate-700 rounded-lg cursor-pointer" oninput="updateRisk()">
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <label class="text-slate-400">เลือดที่เสีย (EBL, mL):</label>
+            <span id="val_ebl" class="font-bold text-white">450</span>
+          </div>
+          <input type="range" id="input_ebl" min="20" max="2500" value="450" step="50" class="w-full h-1.5 bg-slate-700 rounded-lg cursor-pointer" oninput="updateRisk()">
+        </div>
+
+        <div class="pt-1 space-y-1.5 text-xs">
+          <label class="flex items-center gap-1.5 text-rose-300 cursor-pointer">
+            <input type="checkbox" id="input_hypothermia" checked class="rounded accent-rose-500" onchange="updateRisk()">
+            <span>อุณหภูมิกายต่ำใน OR (&lt;36.0°C)</span>
+          </label>
+          <label class="flex items-center gap-1.5 text-slate-300 cursor-pointer">
+            <input type="checkbox" id="input_redose" checked class="rounded accent-sky-500" onchange="updateRisk()">
+            <span>ได้รับ Redose ยาฆ่าเชื้อระหว่างผ่าตัด</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT DASHBOARD: RESULTS & TABS -->
+    <div class="lg:col-span-8 space-y-4">
+
+      <!-- TOP SUMMARY SCORE BANNER -->
+      <div id="risk_banner" class="bg-gradient-to-r from-rose-950/80 via-slate-900 to-slate-900 border border-rose-500/40 rounded-2xl p-5 shadow-2xl transition-all duration-300">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="text-xs uppercase tracking-wider font-semibold text-rose-400 flex items-center gap-1">
+              <span>⚠️</span> ระดับความเสี่ยงทำนาย (Predicted SSI Probability)
+            </span>
+            <div class="flex items-baseline gap-3 mt-1">
+              <span id="risk_percentage" class="text-5xl font-extrabold text-rose-400 tracking-tight">18.6%</span>
+              <span id="risk_badge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                🔴 HIGH RISK TIER
+              </span>
+            </div>
+            <p id="risk_description" class="text-xs text-slate-300 mt-2 max-w-xl">
+              ความเสี่ยงสูงกว่าค่าเฉลี่ยศัลยกรรมทั่วไปอย่างมีนัยสำคัญ (&gt;2.5 เท่า) แนะนำใช้มาตรการป้องกันเชิงรุก (Proactive Surgical Bundle) ทันที
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-2 bg-slate-950/60 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 min-w-[210px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Model Brier Score:</span>
+              <span class="font-bold text-emerald-400">0.0623</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Sensitivity / Spec.:</span>
+              <span class="font-semibold text-white">77.6% / 67.6%</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Optimal Threshold:</span>
+              <span class="font-semibold text-amber-300">6.1% Cutoff</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS NAVIGATION -->
+      <div class="border-b border-slate-800 flex gap-2 sm:gap-4 text-xs font-semibold">
+        <button onclick="switchTab('tab1')" id="tab_btn_1" class="pb-2.5 px-2 border-b-2 border-sky-500 text-sky-400 flex items-center gap-1.5 transition-colors">
+          <span>🎯</span> มาตรการทางการแพทย์
+        </button>
+        <button onclick="switchTab('tab2')" id="tab_btn_2" class="pb-2.5 px-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition-colors">
+          <span>🔍</span> คำอธิบาย AI รายบุคคล (SHAP)
+        </button>
+        <button onclick="switchTab('tab3')" id="tab_btn_3" class="pb-2.5 px-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition-colors">
+          <span>📋</span> ใบส่งมอบห้องพักฟื้น (PACU)
+        </button>
+        <button onclick="switchTab('tab4')" id="tab_btn_4" class="pb-2.5 px-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition-colors">
+          <span>📊</span> ข้อมูลสถิติ &amp; กลุ่มย่อย
+        </button>
+      </div>
+
+      <!-- TAB 1: CLINICAL CARE PLAN -->
+      <div id="tab1_content" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Card 1: Wound Care -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2.5">
+            <h3 class="text-sm font-bold text-sky-400 flex items-center gap-2">
+              <span>🩺</span> 1. การดูแลแผลและวัสดุปิดแผล (Wound Dressing)
+            </h3>
+            <div id="wound_plan" class="text-xs text-slate-300 space-y-2">
+              <!-- dynamic content -->
+            </div>
+          </div>
+
+          <!-- Card 2: Antimicrobial -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2.5">
+            <h3 class="text-sm font-bold text-indigo-400 flex items-center gap-2">
+              <span>💊</span> 2. ยาปฏิชีวนะป้องกัน (Antimicrobial)
+            </h3>
+            <div id="atb_plan" class="text-xs text-slate-300 space-y-2">
+              <!-- dynamic content -->
+            </div>
+          </div>
+
+          <!-- Card 3: Physiologic Optimization -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2.5">
+            <h3 class="text-sm font-bold text-amber-400 flex items-center gap-2">
+              <span>🌡️</span> 3. การฟื้นฟูสรีรวิทยาใน PACU / Ward
+            </h3>
+            <div id="physio_plan" class="text-xs text-slate-300 space-y-2">
+              <!-- dynamic content -->
+            </div>
+          </div>
+
+          <!-- Card 4: Surveillance -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2.5">
+            <h3 class="text-sm font-bold text-emerald-400 flex items-center gap-2">
+              <span>📅</span> 4. แผนติดตามแผลหลังจำหน่าย (Follow-up)
+            </h3>
+            <div id="followup_plan" class="text-xs text-slate-300 space-y-2">
+              <!-- dynamic content -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: EXPLAINABLE AI (SHAP) -->
+      <div id="tab2_content" class="hidden space-y-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+              <span>🔍</span> ปัจจัยที่มีผลต่อความเสี่ยงเฉพาะผู้ป่วยรายนี้ (Patient-Level Feature Contributions)
+            </h3>
+            <span class="text-xs text-slate-400">Based on TreeSHAP / Log-Odds</span>
+          </div>
+
+          <div class="space-y-2.5 pt-2" id="shap_bar_container">
+            <!-- Dynamic SHAP bars will render here -->
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-slate-800 text-xs">
+            <div class="p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg">
+              <span class="font-bold text-rose-400 block mb-1">🔴 ปัจจัยหลักที่ดันความเสี่ยงสูงขึ้น:</span>
+              <ul id="shap_risk_increasers" class="space-y-1 text-slate-300"></ul>
+            </div>
+            <div class="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+              <span class="font-bold text-emerald-400 block mb-1">🟢 ปัจจัยที่ช่วยลดความเสี่ยงหรือปกติ:</span>
+              <ul id="shap_risk_decreasers" class="space-y-1 text-slate-300"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: PACU HANDOVER REPORT -->
+      <div id="tab3_content" class="hidden space-y-3">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+              <span>📋</span> ใบประเมินความเสี่ยงและส่งมอบห้องพักฟื้น (PACU Handover Text)
+            </h3>
+            <button onclick="copyHandover()" id="copy_btn" class="px-3 py-1.5 text-xs bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition-all flex items-center gap-1 font-medium">
+              <span>📋</span> คัดลอกข้อความ (Copy)
+            </button>
+          </div>
+
+          <textarea id="handover_area" readonly class="w-full h-80 bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-mono text-slate-300 leading-relaxed custom-scroll focus:outline-none focus:border-sky-500"></textarea>
+        </div>
+      </div>
+
+      <!-- TAB 4: MODEL & SUBGROUP VALIDATION -->
+      <div id="tab4_content" class="hidden space-y-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+          <h3 class="text-sm font-bold text-white">📊 Table 3: Subgroup &amp; Sensitivity Analysis (Temporal Validation 2024)</h3>
+          <div class="overflow-x-auto custom-scroll text-xs">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 text-slate-400">
+                  <th class="py-2 px-2">หมวดหมู่</th>
+                  <th class="py-2 px-2">กลุ่มย่อย</th>
+                  <th class="py-2 px-2 text-center">จำนวน (N)</th>
+                  <th class="py-2 px-2 text-center">SSI Rate</th>
+                  <th class="py-2 px-2 text-center text-sky-400 font-bold">AUROC</th>
+                  <th class="py-2 px-2 text-center text-emerald-400 font-bold">AUPRC</th>
+                  <th class="py-2 px-2 text-center">Brier</th>
+                  <th class="py-2 px-2 text-center">Sens.</th>
+                  <th class="py-2 px-2 text-center">Spec.</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/60 text-slate-300">
+                <tr class="bg-slate-800/30 font-semibold">
+                  <td class="py-1.5 px-2">Overall Cohort</td>
+                  <td class="py-1.5 px-2">All Test Patients</td>
+                  <td class="py-1.5 px-2 text-center">904</td>
+                  <td class="py-1.5 px-2 text-center">67 (7.4%)</td>
+                  <td class="py-1.5 px-2 text-center text-sky-400">0.803</td>
+                  <td class="py-1.5 px-2 text-center text-emerald-400">0.259</td>
+                  <td class="py-1.5 px-2 text-center">0.0623</td>
+                  <td class="py-1.5 px-2 text-center">77.6%</td>
+                  <td class="py-1.5 px-2 text-center">67.6%</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2">Specialty</td>
+                  <td class="py-1.5 px-2">Colorectal Surgery</td>
+                  <td class="py-1.5 px-2 text-center">247</td>
+                  <td class="py-1.5 px-2 text-center text-rose-400">28 (11.3%)</td>
+                  <td class="py-1.5 px-2 text-center">0.693</td>
+                  <td class="py-1.5 px-2 text-center">0.275</td>
+                  <td class="py-1.5 px-2 text-center">0.0946</td>
+                  <td class="py-1.5 px-2 text-center">53.6%</td>
+                  <td class="py-1.5 px-2 text-center">82.2%</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2">Specialty</td>
+                  <td class="py-1.5 px-2">Non-Colorectal</td>
+                  <td class="py-1.5 px-2 text-center">657</td>
+                  <td class="py-1.5 px-2 text-center">39 (5.9%)</td>
+                  <td class="py-1.5 px-2 text-center text-sky-400 font-semibold">0.846</td>
+                  <td class="py-1.5 px-2 text-center">0.256</td>
+                  <td class="py-1.5 px-2 text-center">0.0501</td>
+                  <td class="py-1.5 px-2 text-center">82.1%</td>
+                  <td class="py-1.5 px-2 text-center">74.4%</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2">Approach</td>
+                  <td class="py-1.5 px-2">Open Laparotomy</td>
+                  <td class="py-1.5 px-2 text-center">590</td>
+                  <td class="py-1.5 px-2 text-center">39 (6.6%)</td>
+                  <td class="py-1.5 px-2 text-center text-sky-400">0.817</td>
+                  <td class="py-1.5 px-2 text-center">0.258</td>
+                  <td class="py-1.5 px-2 text-center">0.0560</td>
+                  <td class="py-1.5 px-2 text-center">82.1%</td>
+                  <td class="py-1.5 px-2 text-center">68.2%</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2">Approach</td>
+                  <td class="py-1.5 px-2">Laparoscopic (Minimally Invasive)</td>
+                  <td class="py-1.5 px-2 text-center">314</td>
+                  <td class="py-1.5 px-2 text-center">28 (8.9%)</td>
+                  <td class="py-1.5 px-2 text-center">0.782</td>
+                  <td class="py-1.5 px-2 text-center text-emerald-400 font-semibold">0.280</td>
+                  <td class="py-1.5 px-2 text-center">0.0740</td>
+                  <td class="py-1.5 px-2 text-center">92.9%</td>
+                  <td class="py-1.5 px-2 text-center">50.0%</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2">Acuity</td>
+                  <td class="py-1.5 px-2">Emergency Surgery</td>
+                  <td class="py-1.5 px-2 text-center">216</td>
+                  <td class="py-1.5 px-2 text-center">17 (7.9%)</td>
+                  <td class="py-1.5 px-2 text-center text-sky-400 font-bold">0.850</td>
+                  <td class="py-1.5 px-2 text-center text-emerald-400 font-bold">0.413</td>
+                  <td class="py-1.5 px-2 text-center">0.0591</td>
+                  <td class="py-1.5 px-2 text-center">64.7%</td>
+                  <td class="py-1.5 px-2 text-center">91.0%</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2">Wound Class</td>
+                  <td class="py-1.5 px-2">Clean / Clean-Contam (I-II)</td>
+                  <td class="py-1.5 px-2 text-center">749</td>
+                  <td class="py-1.5 px-2 text-center">40 (5.3%)</td>
+                  <td class="py-1.5 px-2 text-center">0.799</td>
+                  <td class="py-1.5 px-2 text-center">0.205</td>
+                  <td class="py-1.5 px-2 text-center">0.0472</td>
+                  <td class="py-1.5 px-2 text-center">95.0%</td>
+                  <td class="py-1.5 px-2 text-center">52.3%</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2">Wound Class</td>
+                  <td class="py-1.5 px-2">Contaminated / Dirty (III-IV)</td>
+                  <td class="py-1.5 px-2 text-center">155</td>
+                  <td class="py-1.5 px-2 text-center text-rose-400 font-bold">27 (17.4%)</td>
+                  <td class="py-1.5 px-2 text-center">0.694</td>
+                  <td class="py-1.5 px-2 text-center">0.356</td>
+                  <td class="py-1.5 px-2 text-center">0.1350</td>
+                  <td class="py-1.5 px-2 text-center">74.1%</td>
+                  <td class="py-1.5 px-2 text-center">60.9%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+    <script>
+    // Tab Switching
+    function switchTab(tabId) {
+      ['tab1', 'tab2', 'tab3', 'tab4'].forEach(t => {
+        const content = document.getElementById(t + '_content');
+        if (content) content.classList.add('hidden');
+        const btn = document.getElementById(t.replace('tab', 'tab_btn_'));
+        if (btn) {
+          btn.classList.remove('border-sky-500', 'text-sky-400');
+          btn.classList.add('border-transparent', 'text-slate-400');
+        }
+      });
+      const targetContent = document.getElementById(tabId + '_content');
+      if (targetContent) targetContent.classList.remove('hidden');
+      const targetBtn = document.getElementById(tabId.replace('tab', 'tab_btn_'));
+      if (targetBtn) {
+        targetBtn.classList.add('border-sky-500', 'text-sky-400');
+        targetBtn.classList.remove('border-transparent', 'text-slate-400');
+      }
+    }
+
+    // Risk Calculation Model Simulation
+    function updateRisk() {
+      const ageInput = document.getElementById('input_age');
+      const opTimeInput = document.getElementById('input_op_time');
+      const eblInput = document.getElementById('input_ebl');
+
+      const age = parseInt(ageInput.value) || 65;
+      const sex = document.getElementById('input_sex').value;
+      const bmi = parseFloat(document.getElementById('input_bmi').value) || 24;
+      const asa = parseInt(document.getElementById('input_asa').value) || 3;
+      const emergency = document.getElementById('input_emergency').checked;
+      const dm = document.getElementById('input_dm').checked;
+      const ckd = document.getElementById('input_ckd').checked;
+      const malignancy = document.getElementById('input_malignancy').checked;
+      const smoking = document.getElementById('input_smoking').checked;
+      const albumin = parseFloat(document.getElementById('input_albumin').value) || 3.5;
+      const hct = parseFloat(document.getElementById('input_hct').value) || 35.0;
+      const specialty = document.getElementById('input_specialty').value;
+      const wound = parseInt(document.getElementById('input_wound_class').value) || 2;
+      const approach = document.getElementById('input_approach').value;
+      const atb_timing = document.getElementById('input_atb_timing').value;
+      const op_time = parseInt(opTimeInput.value) || 220;
+      const ebl = parseInt(eblInput.value) || 450;
+      const hypothermia = document.getElementById('input_hypothermia').checked;
+      const redose = document.getElementById('input_redose').checked;
+
+      // Update Slider Value Texts IMMEDIATELY
+      const valAge = document.getElementById('val_age');
+      const valOp = document.getElementById('val_op_time');
+      const valEbl = document.getElementById('val_ebl');
+      if (valAge) valAge.innerText = age;
+      if (valOp) valOp.innerText = op_time;
+      if (valEbl) valEbl.innerText = ebl;
+
+      // Calibrated Log-odds model simulation
+      let logit = -3.20;
+      logit += (age - 55) * 0.015;
+      if (sex === 'Male') logit += 0.12;
+      logit += (bmi - 24) * 0.035;
+      logit += (asa - 2) * 0.28;
+      if (emergency) logit += 0.45;
+      if (dm) logit += 0.42;
+      if (ckd) logit += 0.35;
+      if (malignancy) logit += 0.38;
+      if (smoking) logit += 0.30;
+      logit -= (albumin - 3.5) * 0.65;
+      logit -= (hct - 36.0) * 0.02;
+      
+      // Intraoperative levers
+      if (wound === 2) logit += 0.40;
+      if (wound === 3) logit += 1.05;
+      if (wound === 4) logit += 1.55;
+      if (approach === 'Open') logit += 0.32;
+      if (specialty === 'Colorectal') logit += 0.65;
+      if (specialty === 'Upper_GI') logit += 0.35;
+      
+      logit += (op_time - 150) * 0.0055;
+      logit += (ebl - 200) * 0.0006;
+      if (hypothermia) logit += 0.55;
+      if (atb_timing === 'Late_After_Incision') logit += 0.75;
+      if (atb_timing === 'None_Given') logit += 1.20;
+      if (!redose && op_time >= 180) logit += 0.40;
+
+      // Sigmoid probability with Isotonic shrinkage
+      let prob = 1.0 / (1.0 + Math.exp(-logit));
+      prob = Math.max(0.012, Math.min(0.68, prob));
+      const pct = (prob * 100.0).toFixed(1);
+
+      // DOM Updates
+      const riskPct = document.getElementById('risk_percentage');
+      if (riskPct) riskPct.innerText = pct + '%';
+      const banner = document.getElementById('risk_banner');
+      const badge = document.getElementById('risk_badge');
+      const desc = document.getElementById('risk_description');
+
+      let tier = 'low';
+      if (prob >= 0.15) {
+        tier = 'high';
+        if (banner) banner.className = 'bg-gradient-to-r from-rose-950/80 via-slate-900 to-slate-900 border border-rose-500/40 rounded-2xl p-5 shadow-2xl transition-all duration-300';
+        if (badge) {
+          badge.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-rose-500/20 text-rose-300 border border-rose-500/40';
+          badge.innerText = '🔴 HIGH RISK TIER';
+        }
+        if (riskPct) riskPct.className = 'text-5xl font-extrabold text-rose-400 tracking-tight';
+        if (desc) desc.innerText = 'ความเสี่ยงสูงกว่าค่าเฉลี่ยศัลยกรรมทั่วไปอย่างมีนัยสำคัญ (>2 เท่า) จำเป็นต้องเริ่ม Proactive Surgical Bundle ทันที';
+      } else if (prob >= 0.07) {
+        tier = 'mod';
+        if (banner) banner.className = 'bg-gradient-to-r from-amber-950/80 via-slate-900 to-slate-900 border border-amber-500/40 rounded-2xl p-5 shadow-2xl transition-all duration-300';
+        if (badge) {
+          badge.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-amber-500/20 text-amber-300 border border-amber-500/40';
+          badge.innerText = '🟡 MODERATE RISK TIER';
+        }
+        if (riskPct) riskPct.className = 'text-5xl font-extrabold text-amber-400 tracking-tight';
+        if (desc) desc.innerText = 'ความเสี่ยงระดับปานกลาง ต้องเฝ้าระวังการอักเสบเฉพาะที่ของแผลและควบคุมอุณหภูมิ/น้ำตาลอย่างเคร่งครัด';
+      } else {
+        tier = 'low';
+        if (banner) banner.className = 'bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-900 border border-emerald-500/40 rounded-2xl p-5 shadow-2xl transition-all duration-300';
+        if (badge) {
+          badge.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+          badge.innerText = '🟢 LOW RISK TIER';
+        }
+        if (riskPct) riskPct.className = 'text-5xl font-extrabold text-emerald-400 tracking-tight';
+        if (desc) desc.innerText = 'ความเสี่ยงต่ำ ให้การดูแลตามแนวทางเวชปฏิบัติมาตรฐานทั่วไปของ รพ.สมเด็จพระปิ่นเกล้า';
+      }
+
+      // Update Clinical Recommendations
+      updateClinicalPlan(tier, wound, op_time, hypothermia, dm, albumin, atb_timing, pct);
+
+      // Update SHAP Bars
+      updateShapBars(wound, op_time, albumin, hypothermia, atb_timing, specialty, approach, dm);
+
+      // Update Handover Text
+      const badgeText = badge ? badge.innerText : 'ASSESSED';
+      updateHandoverText(age, sex, bmi, specialty, approach, wound, emergency, asa, op_time, ebl, dm, ckd, malignancy, albumin, hct, hypothermia, atb_timing, redose, pct, badgeText);
+    }
+
+    function updateClinicalPlan(tier, wound, op_time, hypothermia, dm, albumin, atb_timing, pct) {
+      // 1. Wound Plan
+      let w_html = '';
+      if (tier === 'high') {
+        w_html = `
+          <div class="p-2.5 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-300 font-semibold">
+            ⚡ แนะนำพิจารณา Closed-Incision NPWT (ciNPWT)
+          </div>
+          <p>• ใช้เครื่องดูดสุญญากาศแรงดันลบ (-125 mmHg) ปิดแผล 5-7 วัน เพื่อลดการเกิด Seroma และ Hematoma ในแผลเสี่ยงสูง</p>
+          <p>• ปิดแผลปลอดเชื้อกันน้ำ คงไว้ห้ามเปิดทำแผลอย่างน้อย 48 ชั่วโมงแรก</p>
+        `;
+      } else if (tier === 'mod') {
+        w_html = `
+          <div class="p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg text-amber-300 font-semibold">
+            • Advanced Wound Dressing
+          </div>
+          <p>• ใช้วัสดุปิดแผล Hydrocolloid หรือ Film ระบายอากาศได้ดี หลีกเลี่ยงแรงดึงรั้งผิวหนัง</p>
+          <p>• ปิดแผลปลอดเชื้อคงไว้ 48 ชั่วโมง</p>
+        `;
+      } else {
+        w_html = `
+          <div class="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-300 font-semibold">
+            • Standard Sterile Dressing
+          </div>
+          <p>• ปิดผ้าก๊อซปลอดเชื้อมาตรฐาน 48 ชั่วโมง ดูแลความสะอาดตามขั้นตอนปกติ</p>
+        `;
+      }
+      const woundPlan = document.getElementById('wound_plan');
+      if (woundPlan) woundPlan.innerHTML = w_html;
+
+      // 2. ATB Plan
+      let a_html = '';
+      if (atb_timing !== 'Compliant_Within_60min') {
+        a_html += `<div class="p-2 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-300 font-bold mb-1.5">
+          ⚠️ แจ้งเตือน: ให้ยาปฏิชีวนะไม่ตรงเวลา (&lt;60 นาทีก่อนกรีดผิวหนัง)
+        </div>`;
+      }
+      if (wound >= 3) {
+        a_html += `<p>• แผล Class III/IV มีการปนเปื้อน พิจารณาให้ยาปฏิชีวนะครอบคลุมต่อไม่เกิน 24 ชม.</p>`;
+      } else {
+        a_html += `<p>• หยุดยาปฏิชีวนะป้องกันภายในห้องผ่าตัดหรือไม่เกิน 24 ชม. หลังผ่าตัดตามเกณฑ์ Antimicrobial Stewardship</p>`;
+      }
+      const atbPlan = document.getElementById('atb_plan');
+      if (atbPlan) atbPlan.innerHTML = a_html;
+
+      // 3. Physiologic Plan
+      let p_html = '';
+      if (hypothermia) {
+        p_html += `
+          <div class="p-2 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-300 font-semibold mb-1">
+            ❄️ Active Forced-Air Warming ใน PACU ด่วน
+          </div>
+          <p>• ผู้ป่วยมีภาวะตัวเย็นใน OR ต้องรักษาอุณหภูมิร่างกายให้ &gt;36.5°C ป้องกันแผลขาดเลือด</p>
+        `;
+      } else {
+        p_html += `<p>• อุณหภูมิกายใน OR ปกติ รักษาระดับผ้าห่มอุ่นตามเกณฑ์มาตรฐาน</p>`;
+      }
+      if (dm) {
+        p_html += `<p class="text-amber-300 font-medium pt-1">• Strict Glycemic Control: คุมระดับน้ำตาลในเลือดหลังผ่าตัด &lt;180 mg/dL ตลอด 48 ชม.</p>`;
+      }
+      if (albumin < 3.0) {
+        p_html += `<p class="text-amber-300 pt-1">• ภาวะโปรตีนต่ำ (Albumin ${albumin} g/dL): พิจารณาเริ่ม High-Protein Nutrition ทางปากเร็วที่สุด</p>`;
+      }
+      const physioPlan = document.getElementById('physio_plan');
+      if (physioPlan) physioPlan.innerHTML = p_html;
+
+      // 4. Follow-up Plan
+      let f_html = '';
+      if (tier === 'high') {
+        f_html = `
+          <div class="p-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-300 font-semibold mb-1">
+            • นัดตรวจประเมินแผลเร็วขึ้น (Early Review)
+          </div>
+          <p>• นัดตรวจแผลที่ OPD ศัลยกรรมภายใน <b>48–72 ชั่วโมง</b> หลังจำหน่าย</p>
+          <p>• ให้คำแนะนำคนไข้สังเกตอาการบวม แดง ร้อน หนอง หรือมีไข้</p>
+        `;
+      } else {
+        f_html = `
+          <p>• นัดตรวจติดตามแผลและตัดไหมตามนัดมาตรฐาน 7–10 วัน</p>
+          <p>• ให้คำแนะนำการดูแลความสะอาดแผลทั่วไป</p>
+        `;
+      }
+      const followupPlan = document.getElementById('followup_plan');
+      if (followupPlan) followupPlan.innerHTML = f_html;
+    }
+
+    function updateShapBars(wound, op_time, albumin, hypothermia, atb_timing, specialty, approach, dm) {
+      const factors = [];
+      
+      factors.push({ name: 'ระดับความสะอาดแผล (Wound Class ' + wound + ')', val: wound >= 3 ? 0.72 : (wound === 2 ? 0.25 : -0.35) });
+      factors.push({ name: 'ระยะเวลาผ่าตัด (' + op_time + ' นาที)', val: (op_time - 150) * 0.0035 });
+      factors.push({ name: 'ระดับ Albumin ก่อนผ่าตัด (' + albumin + ' g/dL)', val: -(albumin - 3.5) * 0.45 });
+      factors.push({ name: 'อุณหภูมิกายในห้องผ่าตัด', val: hypothermia ? 0.48 : -0.22 });
+      factors.push({ name: 'แผนกศัลยกรรม (' + specialty + ')', val: specialty === 'Colorectal' ? 0.52 : -0.15 });
+      factors.push({ name: 'วิธีการผ่าตัด (' + approach + ')', val: approach === 'Open' ? 0.28 : -0.32 });
+      factors.push({ name: 'ความตรงเวลาของยาปฏิชีวนะ', val: atb_timing === 'Compliant_Within_60min' ? -0.38 : 0.65 });
+      factors.push({ name: 'โรคประจำตัวเบาหวาน (DM)', val: dm ? 0.36 : -0.18 });
+
+      factors.sort((a, b) => Math.abs(b.val) - Math.abs(a.val));
+
+      let barHtml = '';
+      factors.forEach(f => {
+        const isPos = f.val > 0;
+        const width = Math.min(100, Math.abs(f.val) * 110);
+        const color = isPos ? 'bg-rose-500' : 'bg-emerald-500';
+        const sign = isPos ? '+' : '';
+        barHtml += `
+          <div class="text-xs">
+            <div class="flex justify-between text-slate-300 mb-0.5">
+              <span>${f.name}</span>
+              <span class="font-mono font-semibold ${isPos ? 'text-rose-400' : 'text-emerald-400'}">${sign}${f.val.toFixed(2)}</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden flex">
+              <div class="${color} h-2 rounded-full transition-all duration-300" style="width: ${width}%"></div>
+            </div>
+          </div>
+        `;
+      });
+      const shapContainer = document.getElementById('shap_bar_container');
+      if (shapContainer) shapContainer.innerHTML = barHtml;
+
+      const inc = factors.filter(f => f.val > 0.05).slice(0, 3);
+      const dec = factors.filter(f => f.val < -0.05).slice(0, 3);
+
+      const incEl = document.getElementById('shap_risk_increasers');
+      const decEl = document.getElementById('shap_risk_decreasers');
+      if (incEl) incEl.innerHTML = inc.map(f => `<li>• <b>${f.name}</b> (+${f.val.toFixed(2)})</li>`).join('') || '<li>• ไม่พบปัจจัยเสี่ยงเด่นชัด</li>';
+      if (decEl) decEl.innerHTML = dec.map(f => `<li>• <b>${f.name}</b> (${f.val.toFixed(2)})</li>`).join('') || '<li>• ไม่พบปัจจัยปกป้องเด่นชัด</li>';
+    }
+
+    function updateHandoverText(age, sex, bmi, specialty, approach, wound, emergency, asa, op_time, ebl, dm, ckd, malignancy, albumin, hct, hypothermia, atb_timing, redose, pct, badge) {
+      const text = `========================================================================
+🏥 โรงพยาบาลสมเด็จพระปิ่นเกล้า กรมแพทย์ทหารเรือ | แผนกศัลยกรรม
+ใบประเมินความเสี่ยงการติดเชื้อแผลผ่าตัด ณ จุดสิ้นสุดการผ่าตัด (End-of-Surgery)
+========================================================================
+[1. ข้อมูลผู้ป่วยและหัตถการ]
+- อายุ: ${age} ปี | เพศ: ${sex} | ดัชนีมวลกาย (BMI): ${bmi} kg/m²
+- แผนกศัลยกรรม: ${specialty} | วิธีการผ่าตัด: ${approach}
+- ระดับความสะอาดแผล (Wound Class): Class ${wound}
+- ความเร่งด่วน: ${emergency ? 'ผ่าตัดฉุกเฉิน (Emergency)' : 'ผ่าตัดนัดล่วงหน้า (Elective)'} | ASA: Class ${asa}
+- ระยะเวลาผ่าตัด: ${op_time} นาที | ปริมาณเลือดที่เสีย (EBL): ${ebl} mL
+
+[2. ปัจจัยเสี่ยงและการให้ยาปฏิชีวนะ]
+- โรคประจำตัว: DM: ${dm ? 'ใช่' : 'ไม่ใช่'} | CKD: ${ckd ? 'ใช่' : 'ไม่ใช่'} | Malignancy: ${malignancy ? 'ใช่' : 'ไม่ใช่'}
+- ผลตรวจเลือดก่อนผ่าตัด: Albumin ${albumin} g/dL | Hct ${hct}%
+- อุณหภูมิกายใน OR: ${hypothermia ? 'Hypothermia (<36.0°C)' : 'ปกติ (>36.0°C)'}
+- ยาปฏิชีวนะป้องกัน: ${atb_timing} | Redose: ${redose ? 'ได้รับ' : 'ไม่ได้รับ'}
+
+------------------------------------------------------------------------
+[3. ผลการพยากรณ์ความเสี่ยงด้วยปัญญาประดิษฐ์ (Explainable AI Score)]
+- ระดับความน่าจะเป็นของการเกิด SSI ภายใน 30 วัน: ${pct}%
+- กลุ่มความเสี่ยง (Risk Tier): ${badge}
+- โมเดลที่ใช้ประมวลผล: Calibrated Logistic Regression (Brier Score = 0.0623)
+------------------------------------------------------------------------
+
+[4. แผนการดูแลเฉพาะบุคคลที่แนะนำในห้องพักฟื้นและหอผู้ป่วย (Care Plan)]
+- การดูแลแผล: ${pct >= 15.0 ? 'พิจารณาใช้ Closed-Incision NPWT (ciNPWT) 5-7 วัน' : 'ปิดแผลปลอดเชื้อคงไว้ 48 ชั่วโมง'}
+- การฟื้นฟูสรีรวิทยา: ${hypothermia ? 'ใช้ Forced-air warming blanket ใน PACU เพื่อคงอุณหภูมิ >36.5°C' : 'รักษาอุณหภูมิตามมาตรฐาน'}
+- การควบคุมน้ำตาล: ${dm ? 'ควบคุมระดับน้ำตาลหลังผ่าตัด <180 mg/dL ตลอด 48 ชม.' : 'ตรวจตามเกณฑ์มาตรฐาน'}
+- การติดตามแผล: ${pct >= 15.0 ? 'นัดประเมินแผลเร็วขึ้นที่ 48-72 ชม. หลังจำหน่าย' : 'นัดตรวจแผลและตัดไหม 7-10 วัน'}
+
+ผู้ประเมิน: ทีมศัลยแพทย์และพยาบาลห้องผ่าตัด รพ.สมเด็จพระปิ่นเกล้า
+========================================================================`;
+      const handoverArea = document.getElementById('handover_area');
+      if (handoverArea) handoverArea.value = text;
+    }
+
+    function copyHandover() {
+      const copyText = document.getElementById('handover_area');
+      if (!copyText) return;
+      copyText.select();
+      navigator.clipboard.writeText(copyText.value);
+      const btn = document.getElementById('copy_btn');
+      if (btn) {
+        btn.innerHTML = '<span>✅</span> คัดลอกสำเร็จ!';
+        setTimeout(() => {
+          btn.innerHTML = '<span>📋</span> คัดลอกข้อความ (Copy)';
+        }, 2000);
+      }
+    }
+
+    function resetDefaults() {
+      document.getElementById('input_age').value = 65;
+      document.getElementById('input_sex').value = 'Male';
+      document.getElementById('input_bmi').value = 27.4;
+      document.getElementById('input_asa').value = '3';
+      document.getElementById('input_emergency').checked = false;
+      document.getElementById('input_dm').checked = true;
+      document.getElementById('input_ckd').checked = false;
+      document.getElementById('input_malignancy').checked = true;
+      document.getElementById('input_smoking').checked = false;
+      document.getElementById('input_albumin').value = 3.0;
+      document.getElementById('input_hct').value = 35.0;
+      document.getElementById('input_specialty').value = 'Colorectal';
+      document.getElementById('input_wound_class').value = '3';
+      document.getElementById('input_approach').value = 'Open';
+      document.getElementById('input_atb_timing').value = 'Compliant_Within_60min';
+      document.getElementById('input_op_time').value = 220;
+      document.getElementById('input_ebl').value = 450;
+      document.getElementById('input_hypothermia').checked = true;
+      document.getElementById('input_redose').checked = true;
+      updateRisk();
+    }
+
+    function exportHTMLAsJPG() {
+      const btn = document.getElementById('btn_html_export');
+      const origText = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.innerHTML = '<span>⏳ กำลังถ่ายภาพ...</span>';
+        btn.disabled = true;
+      }
+
+      if (typeof html2canvas === 'undefined') {
+        window.print();
+        if (btn) {
+          btn.innerHTML = '<span>🖨️ เปิดหน้าพิมพ์/PDF แล้ว</span>';
+          setTimeout(() => { btn.innerHTML = origText; btn.disabled = false; }, 2500);
+        }
+        return;
+      }
+
+      html2canvas(document.body, {
+        useCORS: true,
+        allowTaint: true,
+        scale: 1.6,
+        backgroundColor: '#020617',
+        scrollX: 0,
+        scrollY: 0
+      }).then(canvas => {
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const ts = now.getFullYear() + pad(now.getMonth()+1) + pad(now.getDate()) + '_' + pad(now.getHours()) + pad(now.getMinutes());
+        const link = document.createElement('a');
+        link.download = 'SSI_Bedside_Assessment_' + ts + '.jpg';
+        link.href = canvas.toDataURL('image/jpeg', 0.95);
+        link.click();
+        if (btn) {
+          btn.innerHTML = '<span>✅ บันทึก JPG สำเร็จ!</span>';
+          setTimeout(() => { btn.innerHTML = origText; btn.disabled = false; }, 2500);
+        }
+      }).catch(err => {
+        console.error(err);
+        if (btn) {
+          btn.innerHTML = '<span>❌ ถ่ายภาพไม่สำเร็จ</span>';
+          setTimeout(() => { btn.innerHTML = origText; btn.disabled = false; }, 2500);
+        }
+      });
+    }
+
+    // Initialize
+    updateRisk();
+  </script>
+</body>
+</html>

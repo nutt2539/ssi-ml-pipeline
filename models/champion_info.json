@@ -1,0 +1,6 @@
+{
+  "champion_name": "Logistic_Regression",
+  "has_calibration": true,
+  "calibrated_model_file": "Calibrated_Champion_Model.pkl",
+  "base_model_file": "Logistic_Regression.pkl"
+}

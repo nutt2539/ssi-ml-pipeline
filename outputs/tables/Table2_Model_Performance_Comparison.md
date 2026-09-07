@@ -1,0 +1,8 @@
+# Table 2: Model Performance on Temporal Validation Cohort (Hold-out Test Set)
+
+   Prediction Model        AUROC (95% CI)        AUPRC (95% CI) Brier Score Optimal Cutoff Sensitivity (%) Specificity (%) PPV (%) NPV (%)
+Logistic Regression 0.804 (0.760 - 0.852) 0.257 (0.180 - 0.356)      0.1933          0.374           91.0%           54.8%   13.9%   98.7%
+      Random Forest 0.745 (0.692 - 0.813) 0.207 (0.141 - 0.317)      0.0833          0.249           68.7%           73.2%   17.0%   96.7%
+           LightGBM 0.768 (0.718 - 0.821) 0.222 (0.154 - 0.330)      0.1929          0.492           76.1%           70.4%   17.1%   97.4%
+            XGBoost 0.723 (0.671 - 0.784) 0.188 (0.126 - 0.298)      0.1033          0.127           85.1%           49.0%   11.8%   97.6%
+Calibrated Champion 0.803 (0.755 - 0.851) 0.259 (0.182 - 0.359)      0.0623          0.061           77.6%           67.6%   16.1%   97.4%

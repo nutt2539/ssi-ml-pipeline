@@ -1,0 +1,102 @@
+{
+  "Logistic_Regression": {
+    "AUROC": 0.8037,
+    "AUROC_95CI": [
+      0.7601,
+      0.8038,
+      0.8517
+    ],
+    "AUPRC": 0.2569,
+    "AUPRC_95CI": [
+      0.1802,
+      0.2622,
+      0.3564
+    ],
+    "Brier_Score": 0.1933,
+    "Optimal_Threshold": 0.3745,
+    "Sensitivity": 0.9104,
+    "Specificity": 0.5484,
+    "PPV": 0.139,
+    "NPV": 0.9871
+  },
+  "Random_Forest": {
+    "AUROC": 0.7454,
+    "AUROC_95CI": [
+      0.6918,
+      0.7479,
+      0.8134
+    ],
+    "AUPRC": 0.2072,
+    "AUPRC_95CI": [
+      0.1408,
+      0.2159,
+      0.3172
+    ],
+    "Brier_Score": 0.0833,
+    "Optimal_Threshold": 0.2488,
+    "Sensitivity": 0.6866,
+    "Specificity": 0.7324,
+    "PPV": 0.1704,
+    "NPV": 0.9669
+  },
+  "LightGBM": {
+    "AUROC": 0.7678,
+    "AUROC_95CI": [
+      0.7176,
+      0.7719,
+      0.8205
+    ],
+    "AUPRC": 0.2216,
+    "AUPRC_95CI": [
+      0.1543,
+      0.2289,
+      0.3303
+    ],
+    "Brier_Score": 0.1929,
+    "Optimal_Threshold": 0.4921,
+    "Sensitivity": 0.7612,
+    "Specificity": 0.7037,
+    "PPV": 0.1706,
+    "NPV": 0.9736
+  },
+  "XGBoost": {
+    "AUROC": 0.7228,
+    "AUROC_95CI": [
+      0.6712,
+      0.7263,
+      0.7843
+    ],
+    "AUPRC": 0.1882,
+    "AUPRC_95CI": [
+      0.1264,
+      0.1985,
+      0.2978
+    ],
+    "Brier_Score": 0.1033,
+    "Optimal_Threshold": 0.127,
+    "Sensitivity": 0.8507,
+    "Specificity": 0.4898,
+    "PPV": 0.1178,
+    "NPV": 0.9762
+  },
+  "Calibrated_Champion": {
+    "AUROC": 0.803,
+    "AUROC_95CI": [
+      0.7546,
+      0.8046,
+      0.8512
+    ],
+    "AUPRC": 0.2593,
+    "AUPRC_95CI": [
+      0.1819,
+      0.2666,
+      0.3586
+    ],
+    "Brier_Score": 0.0623,
+    "Optimal_Threshold": 0.0607,
+    "Sensitivity": 0.7761,
+    "Specificity": 0.6762,
+    "PPV": 0.161,
+    "NPV": 0.9742
+  }
+}
